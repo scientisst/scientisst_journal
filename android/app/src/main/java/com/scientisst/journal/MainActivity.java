@@ -1,4 +1,4 @@
-package com.scientisst.scientisst_journal;
+package com.scientisst.journal;
 
 import io.flutter.embedding.android.FlutterActivity;
 

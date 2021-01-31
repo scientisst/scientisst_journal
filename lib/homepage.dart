@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:scientisst_journal/studies/studies.dart';
+import 'package:scientisst_journal/journal/journal.dart';
 import 'package:scientisst_journal/test/test.dart';
 import 'package:scientisst_journal/settings/settings.dart';
 
@@ -11,16 +11,16 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int _index = 0;
+  int _index = 1;
 
   final _items = <BottomNavigationBarItem>[
     BottomNavigationBarItem(
         icon: Icon(Icons.stacked_line_chart), label: "Test"),
-    BottomNavigationBarItem(icon: Icon(Icons.graphic_eq), label: "Studies"),
+    BottomNavigationBarItem(icon: Icon(Icons.graphic_eq), label: "Journal"),
     BottomNavigationBarItem(icon: Icon(Icons.settings), label: "Settings"),
   ];
 
-  final _children = <Widget>[Test(), Studies(), Settings()];
+  final _children = <Widget>[Test(), Journal(), Settings()];
 
   @override
   Widget build(BuildContext context) {

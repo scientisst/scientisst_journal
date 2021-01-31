@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:scientisst_journal/test/test_charts.dart';
 import 'package:scientisst_journal/ui/sensor_button.dart';
 
 class Test extends StatefulWidget {
@@ -9,13 +10,24 @@ class Test extends StatefulWidget {
 }
 
 class _TestState extends State<Test> {
-  final Map<String, bool> _sensorsState = {"Light": false, "Microphone": false};
+  final Map<String, bool> _sensorsState = {
+    "accelerometer": false,
+    "light": false,
+    "microphone": false
+  };
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        heroTag: null,
+        onPressed: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => TestCharts(_sensorsState),
+            ),
+          );
+        },
         child: Icon(
           Icons.play_arrow,
         ),
@@ -24,6 +36,12 @@ class _TestState extends State<Test> {
         padding: EdgeInsets.all(8),
         crossAxisCount: 3,
         children: [
+          _buildButton(
+            label: "Accelerometer",
+            icon: Icon(Icons.extension_rounded),
+            disabledIcon: Icon(Icons.extension_outlined),
+            color: Colors.blue,
+          ),
           _buildButton(
             label: "Light",
             icon: Icon(Icons.lightbulb),
@@ -42,16 +60,18 @@ class _TestState extends State<Test> {
   }
 
   Widget _buildButton(
-          {@required String label,
-          @required Widget icon,
-          Widget disabledIcon,
-          Color color = Colors.blueAccent}) =>
-      SensorButton(
-        onPressed: () =>
-            setState(() => _sensorsState[label] = !_sensorsState[label]),
-        icon: _sensorsState[label] ? icon : disabledIcon,
-        label: label,
-        active: _sensorsState[label],
-        color: color,
-      );
+      {@required String label,
+      @required Widget icon,
+      Widget disabledIcon,
+      Color color = Colors.blueAccent}) {
+    final active = _sensorsState[label.toLowerCase()];
+    return SensorButton(
+      onPressed: () =>
+          setState(() => _sensorsState[label.toLowerCase()] = !active),
+      icon: active ? icon : disabledIcon,
+      label: label,
+      active: active,
+      color: color,
+    );
+  }
 }

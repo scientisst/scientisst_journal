@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 
-class Studies extends StatefulWidget {
-  const Studies({Key key}) : super(key: key);
+class Journal extends StatefulWidget {
+  const Journal({Key key}) : super(key: key);
 
   @override
-  _StudiesState createState() => _StudiesState();
+  _JournalState createState() => _JournalState();
 }
 
-class _StudiesState extends State<Studies> {
+class _JournalState extends State<Journal> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
+        heroTag: null,
         onPressed: () {},
         child: Icon(
           Icons.add,

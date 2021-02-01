@@ -7,6 +7,10 @@ class FixedList<T> extends ListBase<T> {
   FixedList(this.length, {T defaultValue})
       : _list = List<T>.filled(length, defaultValue, growable: true);
 
+  FixedList.from(List<T> list)
+      : _list = List.from(list, growable: true),
+        length = list.length;
+
   void add(dynamic value) {
     _list.removeAt(0);
     _list.add(value);

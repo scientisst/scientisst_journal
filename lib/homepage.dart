@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_sensors/flutter_sensors.dart';
 import 'package:scientisst_journal/journal/journal.dart';
 import 'package:scientisst_journal/test/test.dart';
 import 'package:scientisst_journal/settings/settings.dart';
@@ -12,6 +15,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _index = 1;
+  StreamSubscription subscription;
 
   final _items = <BottomNavigationBarItem>[
     BottomNavigationBarItem(
@@ -21,6 +25,12 @@ class _HomePageState extends State<HomePage> {
   ];
 
   final _children = <Widget>[Test(), Journal(), Settings()];
+
+  @override
+  void dispose() {
+    subscription?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

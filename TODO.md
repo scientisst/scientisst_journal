@@ -1,4 +1,5 @@
 # TODO
 
-- Create controller for each sensor
-- Substitute accelerometer by FixedList
+- Avoid starting the acquisiton without sensors
+- Decimate signals to avoid drawing every point
+- Save data to csv file

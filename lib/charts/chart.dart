@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:charts_common/common.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
@@ -24,34 +22,31 @@ class Chart extends StatelessWidget {
         data: data,
       ),
     ];
-    return Padding(
-      padding: EdgeInsets.all(8),
-      child: charts.TimeSeriesChart(
-        _series,
-        defaultRenderer:
-            new LineRendererConfig(includeArea: area, strokeWidthPx: 3),
-        animate: false,
-        behaviors: [
-          new charts.LinePointHighlighter(
-              showHorizontalFollowLine:
-                  charts.LinePointHighlighterFollowLineType.none,
-              showVerticalFollowLine:
-                  charts.LinePointHighlighterFollowLineType.none),
-          new charts.SelectNearest(eventTrigger: null),
-        ],
-        primaryMeasureAxis: charts.NumericAxisSpec(
-          tickProviderSpec:
-              new charts.BasicNumericTickProviderSpec(zeroBound: false),
-          //renderSpec: NoneRenderSpec(),
-          showAxisLine: true,
-        ),
-        domainAxis: DateTimeAxisSpec(
-          //showAxisLine: false,
-          tickProviderSpec: DateTimeEndPointsTickProviderSpec(),
-          tickFormatterSpec:
-              BasicDateTimeTickFormatterSpec.fromDateFormat(DateFormat.ms()),
-          renderSpec: NoneRenderSpec(),
-        ),
+    return charts.TimeSeriesChart(
+      _series,
+      defaultRenderer:
+          new LineRendererConfig(includeArea: area, strokeWidthPx: 3),
+      animate: false,
+      behaviors: [
+        new charts.LinePointHighlighter(
+            showHorizontalFollowLine:
+                charts.LinePointHighlighterFollowLineType.none,
+            showVerticalFollowLine:
+                charts.LinePointHighlighterFollowLineType.none),
+        new charts.SelectNearest(eventTrigger: null),
+      ],
+      primaryMeasureAxis: charts.NumericAxisSpec(
+        tickProviderSpec:
+            new charts.BasicNumericTickProviderSpec(zeroBound: false),
+        //renderSpec: NoneRenderSpec(),
+        showAxisLine: true,
+      ),
+      domainAxis: DateTimeAxisSpec(
+        //showAxisLine: false,
+        tickProviderSpec: DateTimeEndPointsTickProviderSpec(),
+        tickFormatterSpec:
+            BasicDateTimeTickFormatterSpec.fromDateFormat(DateFormat.ms()),
+        //renderSpec: NoneRenderSpec(),
       ),
     );
   }

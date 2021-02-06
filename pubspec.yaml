@@ -30,6 +30,8 @@ dependencies:
   cupertino_icons: ^1.0.1
   flutter_sensors: ^0.1.6 # multiple sensors
   charts_flutter: ^0.9.0 # charts
+  scientisst_db:
+    path: ../scientisst_db
 
 dev_dependencies:
   flutter_test:

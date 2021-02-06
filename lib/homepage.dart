@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_sensors/flutter_sensors.dart';
 import 'package:scientisst_journal/journal/journal.dart';
 import 'package:scientisst_journal/test/test.dart';
 import 'package:scientisst_journal/settings/settings.dart';

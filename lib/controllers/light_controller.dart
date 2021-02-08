@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter_sensors/flutter_sensors.dart';
 import 'package:scientisst_journal/controllers/controller.dart';
-import 'package:scientisst_journal/data/fixed_list.dart';
 import 'package:scientisst_journal/data/sensor_options.dart';
 import 'package:scientisst_journal/data/sensor_value.dart';
 

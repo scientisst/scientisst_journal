@@ -1,18 +1,7 @@
 import 'package:flutter/material.dart';
-      inicornButton(
-        hasLabel: true,
-        labelText: "Study",
-        currentButton: FloatingActionButton(
-          heroTag: null,
-          mini: true,
-          child: Icon(Icons.integration_instructions),
-          onPressed: () {},
-        ),
-      ),
 import 'package:scientisst_db/scientisst_db.dart';
 import 'package:scientisst_journal/data/report.dart';
 import 'package:scientisst_journal/journal/reportWidget.dart';
-import 'package:scientisst_journal/ui/fancy_fab.dart';
 import 'package:unicorndial/unicorndial.dart';
 
 class Journal extends StatefulWidget {
@@ -82,48 +71,60 @@ class _JournalState extends State<Journal> {
           childButtons: childButtons),
       body: SafeArea(
         child: FutureBuilder(
-          future: ScientISSTdb.instance.collection("history").getDocuments(),
-          builder: (context, AsyncSnapshot<List<DocumentSnapshot>> snap) {
-            if (snap.hasError || snap.data == null)
-              return Center(
-                child: Text("Empty"),
-              );
-            else
-              return RefreshIndicator(
-                onRefresh: () {
-                  setState(() {});
-                  return Future.value(null);
-                },
-                child: ListView(
-                  children: List<ListTile>.from(
-                    snap.data.map(
-                      (DocumentSnapshot doc) {
-                        final Report report = Report.fromDocument(doc);
-                        return ListTile(
-                          title: Text(
-                            report.title,
-                          ),
-                          subtitle: Text(
-                            report.timestamp.toString(),
-                          ),
-                          onTap: () => Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => ReportWidget(
-                                Report.fromDocument(doc),
+          future: ScientISSTdb.instance
+              .collection("history")
+              .orderBy("timestamp", ascending: false)
+              .where("title", isEqualTo: "Experiência s")
+              .getDocuments(),
+          builder: (context, AsyncSnapshot<List<DocumentSnapshot>> snap) =>
+              RefreshIndicator(
+            onRefresh: () {
+              setState(() {});
+              return Future.value(null);
+            },
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                if (snap.hasError || snap.data == null || snap.data.isEmpty)
+                  return SingleChildScrollView(
+                    physics: AlwaysScrollableScrollPhysics(),
+                    child: Container(
+                      height: constraints.maxHeight,
+                      alignment: Alignment.center,
+                      child: Text('Empty'),
+                    ),
+                  );
+                else
+                  return ListView(
+                    children: List<ListTile>.from(
+                      snap.data.map(
+                        (DocumentSnapshot doc) {
+                          final Report report = Report.fromDocument(doc);
+                          return ListTile(
+                            title: Text(
+                              report.title,
+                            ),
+                            subtitle: Text(
+                              report.timestamp.toString(),
+                            ),
+                            onTap: () => Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => ReportWidget(
+                                  Report.fromDocument(doc),
+                                ),
                               ),
                             ),
-                          ),
-                          onLongPress: () {
-                            doc.reference.delete();
-                            setState(() {});
-                          },
-                        );
-                      },
+                            onLongPress: () {
+                              doc.reference.delete();
+                              setState(() {});
+                            },
+                          );
+                        },
+                      ),
                     ),
-                  ),
-                ),
-              );
-          },
+                  );
+              },
+            ),
+          ),
         ),
       ),
     );

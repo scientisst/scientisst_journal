@@ -11,6 +11,6 @@ class Study extends HistoryEntry {
           id: doc.id,
           type: "study",
           title: doc.data["title"],
-          timestamp: DateTime.parse(doc.data["timestamp"]),
+          timestamp: doc.data["timestamp"],
         );
 }

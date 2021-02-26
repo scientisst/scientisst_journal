@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:scientisst_journal/homepage.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(MyApp());
 }
 

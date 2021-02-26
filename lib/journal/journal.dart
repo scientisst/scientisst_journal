@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:scientisst_db/scientisst_db.dart';
-import 'package:scientisst_journal/data/historyEntry.dart';
-import 'package:scientisst_journal/data/report.dart';
-import 'package:scientisst_journal/journal/reportWidget.dart';
-import 'package:scientisst_journal/utils/database.dart';
+import 'package:scientisst_journal/data/history_entry.dart';
+import 'package:scientisst_journal/data/report/report.dart';
+import 'package:scientisst_journal/journal/report/report_screen.dart';
+import 'package:scientisst_journal/utils/database/database.dart';
 import 'package:unicorndial/unicorndial.dart';
 
 class Journal extends StatefulWidget {
@@ -47,18 +47,13 @@ class _JournalState extends State<Journal> {
     Report report = await Database.newReport();
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => ReportWidget(report),
+        builder: (context) => ReportScreen(report),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    ScientISSTdb.instance.collection("history").getDocuments().then(
-          (value) => value.forEach(
-            (doc) => print("data: ${doc.data}"),
-          ),
-        );
     return Scaffold(
       floatingActionButton: UnicornDialer(
           hasBackground: false,
@@ -90,7 +85,8 @@ class _JournalState extends State<Journal> {
                     onTap: () async {
                       Widget page;
                       if (entry.isReport) {
-                        page = ReportWidget(await Database.getReport(entry.id));
+                        page = ReportScreen(
+                            await ReportFunctions.getReport(entry.id));
                       } else if (entry.isStudy) {
                         //page = ReportWidget(await Database.getReport(entry.id));
                         page = Container();

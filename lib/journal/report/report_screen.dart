@@ -1,25 +1,30 @@
 import 'package:buttons_tabbar/buttons_tabbar.dart';
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:scientisst_db/scientisst_db.dart';
-import 'package:scientisst_journal/data/report.dart';
-import 'package:scientisst_journal/data/reportEntry.dart';
-import 'package:scientisst_journal/journal/textInput.dart';
-import 'package:scientisst_journal/utils/database.dart';
+import 'package:scientisst_journal/data/report/report.dart';
+import 'package:scientisst_journal/data/report/report_entry.dart';
+import 'package:scientisst_journal/journal/report/cards/report_entry_card.dart';
+import 'package:scientisst_journal/journal/report/input/text_input.dart';
+import 'package:scientisst_journal/journal/report/input/camera_input.dart';
+import 'package:scientisst_journal/utils/database/database.dart';
 
 const ANIMATION_DURATION = Duration(milliseconds: 250);
+const BAR_MIN_HEIGHT = 88.0;
 
-class ReportWidget extends StatefulWidget {
-  const ReportWidget(this.report, {Key key}) : super(key: key);
+class ReportScreen extends StatefulWidget {
+  const ReportScreen(this.report, {Key key}) : super(key: key);
 
   final Report report;
 
   @override
-  _ReportWidgetState createState() => _ReportWidgetState();
+  _ReportScreenState createState() => _ReportScreenState();
 }
 
-class _ReportWidgetState extends State<ReportWidget> {
+abstract class ReportScreenState extends State<ReportScreen> {
   TextEditingController _titleController;
   bool _editTitle = false;
+  bool _panning = false;
   FocusNode _titleFocus = FocusNode();
   double _halfOffset = 0;
   Duration _animationDuration = Duration.zero;
@@ -28,21 +33,20 @@ class _ReportWidgetState extends State<ReportWidget> {
       icon: Icon(Icons.message),
     ),
     Tab(
-      icon: Icon(Icons.camera),
+      icon: Icon(Icons.camera_alt),
     ),
   ];
   List<Widget> _tabViews;
+}
 
+class _ReportScreenState extends ReportScreenState {
   @override
   void initState() {
     super.initState();
     _tabViews = [
       TextInput(_addNote),
-      Center(
-        child: Container(),
-      ),
+      CameraInput(_addImage),
     ];
-
     _titleController = TextEditingController(text: widget.report.title);
   }
 
@@ -65,9 +69,16 @@ class _ReportWidgetState extends State<ReportWidget> {
     });
   }
 
-  void _addNote(String text) async {
+  Future<void> _addNote(String text) async {
     if (text.isNotEmpty) {
-      await Database.addReportNote(widget.report.id, text);
+      await ReportFunctions.addReportNote(widget.report.id, text);
+    }
+  }
+
+  Future<void> _addImage(XFile image) async {
+    if (image != null) {
+      await ReportFunctions.addReportImage(
+          widget.report.id, await image.readAsBytes());
     }
   }
 
@@ -79,8 +90,21 @@ class _ReportWidgetState extends State<ReportWidget> {
         child: LayoutBuilder(
           builder: (context, constraints) {
             final double halfHeight = constraints.maxHeight / 2;
+            if (!_panning) {
+              if (_halfOffset < -halfHeight / 2) {
+                _halfOffset = -halfHeight;
+              } else if (_halfOffset >= halfHeight / 2) {
+                FocusScope.of(context).unfocus();
+                _halfOffset = halfHeight;
+              } else {
+                _halfOffset = 0;
+              }
+            }
             return GestureDetector(
-              onPanStart: (_) => _animationDuration = Duration.zero,
+              onPanStart: (_) {
+                _panning = true;
+                _animationDuration = Duration.zero;
+              },
               onPanUpdate: (DragUpdateDetails details) {
                 final double dy = details.delta.dy;
                 if (_halfOffset + dy >= -halfHeight &&
@@ -91,74 +115,42 @@ class _ReportWidgetState extends State<ReportWidget> {
                 }
               },
               onPanEnd: (_) {
-                double newOffset = _halfOffset;
-                if (_halfOffset < -halfHeight / 2) {
-                  newOffset = -halfHeight;
-                } else if (_halfOffset >= halfHeight / 2) {
-                  newOffset = halfHeight;
-                } else {
-                  newOffset = 0;
-                }
-                setState(() {
-                  _animationDuration = ANIMATION_DURATION;
-                  _halfOffset = newOffset;
-                });
+                _panning = false;
+                _animationDuration = ANIMATION_DURATION;
               },
               child: Stack(
                 children: [
                   AnimatedContainer(
-                    constraints: BoxConstraints(minHeight: halfHeight),
+                    constraints: BoxConstraints(
+                      minHeight: halfHeight,
+                      maxHeight: halfHeight * 2 - BAR_MIN_HEIGHT,
+                    ),
                     height: halfHeight + _halfOffset,
                     duration: _animationDuration,
                     child: StreamBuilder(
-                      stream: Database.getReportEntries(widget.report.id),
-                      builder: (context,
-                              AsyncSnapshot<List<ReportEntry>> snap) =>
-                          snap.hasError || snap.data == null
-                              ? Container()
-                              : ListView.builder(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 8,
-                                  ),
-                                  itemCount: snap.data.length,
-                                  itemBuilder: (context, index) {
-                                    final ReportEntry entry = snap.data[index];
-                                    return Card(
-                                      elevation: 4,
-                                      child: Container(
-                                        padding: EdgeInsets.all(8),
-                                        constraints: BoxConstraints(
-                                          maxHeight: 254,
-                                          minHeight: 64,
-                                        ),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Text(
-                                              entry.text,
-                                            ),
-                                            SizedBox(
-                                              height: 8,
-                                            ),
-                                            Text(
-                                              entry.timestamp.toIso8601String(),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    );
-                                  },
+                      stream:
+                          ReportFunctions.getReportEntries(widget.report.id),
+                      builder:
+                          (context, AsyncSnapshot<List<ReportEntry>> snap) {
+                        return snap.hasError || snap.data == null
+                            ? Container(child: Text("Empty"))
+                            : ListView.builder(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 8,
                                 ),
+                                itemCount: snap.data.length,
+                                itemBuilder: (context, index) =>
+                                    ReportEntryCard(snap.data[index]),
+                              );
+                      },
                     ),
                   ),
                   Align(
                     alignment: Alignment.bottomCenter,
                     child: AnimatedContainer(
                       constraints: const BoxConstraints(
-                        minHeight: 88,
+                        minHeight: BAR_MIN_HEIGHT,
                       ),
                       decoration: const BoxDecoration(
                         boxShadow: <BoxShadow>[
@@ -198,9 +190,11 @@ class _ReportWidgetState extends State<ReportWidget> {
                                 duration: 150,
                               ),
                             ),
-                            Expanded(
-                              child: TabBarView(children: _tabViews),
-                            ),
+                            halfHeight - _halfOffset - BAR_MIN_HEIGHT > 64
+                                ? Expanded(
+                                    child: TabBarView(children: _tabViews),
+                                  )
+                                : Container(),
                           ],
                         ),
                       ),

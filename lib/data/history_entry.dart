@@ -19,7 +19,7 @@ class HistoryEntry {
       : id = doc.id,
         type = doc.data["type"],
         title = doc.data["title"],
-        timestamp = DateTime.parse(doc.data["timestamp"]);
+        timestamp = doc.data["timestamp"];
 
   bool get isReport => type == "report";
   bool get isStudy => type == "study";

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:scientisst_db/scientisst_db.dart';
-import 'package:scientisst_journal/data/historyEntry.dart';
+import 'package:scientisst_journal/data/history_entry.dart';
 
 class Report extends HistoryEntry {
   Report({@required id, @required title, @required timestamp})
@@ -11,6 +11,6 @@ class Report extends HistoryEntry {
           id: doc.id,
           type: "report",
           title: doc.data["title"],
-          timestamp: DateTime.parse(doc.data["timestamp"]),
+          timestamp: doc.data["timestamp"],
         );
 }

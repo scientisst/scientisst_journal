@@ -88,35 +88,37 @@ class _CameraInputState extends State<CameraInput> {
           return Column(
             children: [
               Expanded(
-                child: LayoutBuilder(
-                  builder: (context, constraints) => Stack(
-                    children: [
-                      Center(
-                        child: AspectRatio(
-                          aspectRatio: 1,
-                          child: ClipRect(
-                            child: OverflowBox(
-                              maxWidth: constraints.maxWidth,
-                              maxHeight: double.infinity,
-                              child: CameraPreview(_controller),
+                child: Stack(
+                  children: [
+                    Center(
+                      child: AspectRatio(
+                        aspectRatio: 1,
+                        child: ClipRect(
+                          child: Transform.scale(
+                            scale: _controller.value.aspectRatio,
+                            child: Center(
+                              child: AspectRatio(
+                                aspectRatio: 1 / _controller.value.aspectRatio,
+                                child: CameraPreview(_controller),
+                              ),
                             ),
                           ),
                         ),
                       ),
-                      Align(
-                        alignment: Alignment.topRight,
-                        child: FlatButton(
-                          shape: CircleBorder(),
-                          child: Icon(
-                            Icons.camera_front,
-                            color: Colors.white,
-                          ),
-                          color: Colors.black38,
-                          onPressed: switchCamera,
+                    ),
+                    Align(
+                      alignment: Alignment.topRight,
+                      child: FlatButton(
+                        shape: CircleBorder(),
+                        child: Icon(
+                          Icons.camera_front,
+                          color: Colors.white,
                         ),
+                        color: Colors.black38,
+                        onPressed: switchCamera,
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
               IgnorePointer(

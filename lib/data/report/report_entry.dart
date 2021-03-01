@@ -42,5 +42,5 @@ abstract class ReportEntry {
   bool get isVideo => _type == "video";
   bool get isText => _type == "text";
 
-  Future<void> delete() async => await _reference.delete();
+  Future<void> delete() async => await _reference.delete(); // TODO delete files
 }

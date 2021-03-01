@@ -37,6 +37,12 @@ dependencies:
   buttons_tabbar: ^1.1.1
   camera: ^0.7.0+2
   intl: ^0.16.1
+  image: ^2.1.19
+  archive: ^2.0.13
+  path_provider: ^1.6.27
+  file_picker: ^2.1.6
+  permission_handler: ^5.1.0+2
+  share: ^0.6.5+4
 
 dev_dependencies:
   flutter_test:

@@ -7,8 +7,15 @@ class _ImageCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Text(entry.legend),
+    return FutureBuilder(
+      future: entry.getImage(),
+      builder: (BuildContext context, AsyncSnapshot<File> snap) {
+        return snap.hasData
+            ? Container(
+                child: Image.file(snap.data),
+              )
+            : Container();
+      },
     );
   }
 }

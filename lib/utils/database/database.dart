@@ -1,11 +1,12 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:camera/camera.dart';
 import 'package:scientisst_db/scientisst_db.dart';
 import 'package:scientisst_journal/data/history_entry.dart';
 import 'package:scientisst_journal/data/report/report.dart';
 import 'package:scientisst_journal/data/report/report_entry.dart';
+import 'package:archive/archive_io.dart';
+import 'package:path_provider/path_provider.dart';
 
 part 'report.dart';
 
@@ -17,18 +18,28 @@ class Database {
       ScientISSTdb.instance.files.directory("reports");
 
   static Stream<List<HistoryEntry>> getHistory() => _historyReference
-      .orderBy("timestamp", ascending: false)
-      .watchDocuments()
-      .map(
-        (List<DocumentSnapshot> docs) => List<HistoryEntry>.from(
-          docs.map(
-            (DocumentSnapshot doc) => HistoryEntry.fromDocument(doc),
-          ),
-        ),
+          .orderBy("timestamp", ascending: false)
+          .watchDocuments()
+          .map(
+        (List<DocumentSnapshot> docs) {
+          return List<HistoryEntry>.from(
+            docs.map(
+              (DocumentSnapshot doc) => HistoryEntry.fromDocument(doc),
+            ),
+          );
+        },
       );
 
-  static Future<void> deleteHistoryEntry(String id) async =>
-      await _historyReference.document(id).delete();
+  static Future<void> deleteHistoryEntry(String id) async {
+    await _historyReference.document(id).delete();
+    try {
+      await _reportsFilesReference.directory(id).delete();
+    } on FileSystemException catch (e) {
+      if (e.osError.errorCode != 2)
+        throw e; // if error is not "No such file or directory"
+
+    }
+  }
 
   static Future<Report> newReport() async {
     final DateTime now = DateTime.now();

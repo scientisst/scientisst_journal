@@ -4,7 +4,7 @@ class ImageEntry extends ReportEntry {
   String imagePath;
 
   ImageEntry.fromDocument(DocumentSnapshot doc)
-      : imagePath = doc.data["path"],
+      : imagePath = doc.data["image"],
         super(
           reference: doc.reference,
           timestamp: doc.data["timestamp"],
@@ -12,7 +12,7 @@ class ImageEntry extends ReportEntry {
           type: "image",
         );
 
-  String get legend => _text;
+  String get caption => _text;
 
   Future<File> getImage() async => await Database.getFile(imagePath);
 }

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:scientisst_journal/data/report/report_entry.dart';
@@ -41,7 +43,11 @@ class ReportEntryCard extends StatelessWidget {
     ));
     children.add(content);
     return Card(
-      elevation: 3,
+      elevation: 4,
+      clipBehavior: Clip.antiAliasWithSaveLayer,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,

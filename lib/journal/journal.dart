@@ -1,5 +1,7 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:scientisst_db/scientisst_db.dart';
+import 'dart:io';
 import 'package:scientisst_journal/data/history_entry.dart';
 import 'package:scientisst_journal/data/report/report.dart';
 import 'package:scientisst_journal/journal/report/report_screen.dart';
@@ -20,6 +22,16 @@ class _JournalState extends State<Journal> {
   void initState() {
     super.initState();
     childButtons = [
+      UnicornButton(
+        hasLabel: true,
+        labelText: "Import",
+        currentButton: FloatingActionButton(
+          heroTag: null,
+          mini: true,
+          child: Icon(Icons.download_rounded),
+          onPressed: _import,
+        ),
+      ),
       UnicornButton(
         hasLabel: true,
         labelText: "Report",
@@ -54,6 +66,7 @@ class _JournalState extends State<Journal> {
 
   @override
   Widget build(BuildContext context) {
+    //ScientISSTdb.clearDatabase();
     return Scaffold(
       floatingActionButton: UnicornDialer(
           hasBackground: false,
@@ -66,6 +79,7 @@ class _JournalState extends State<Journal> {
         child: StreamBuilder(
           stream: Database.getHistory(),
           builder: (context, AsyncSnapshot<List<HistoryEntry>> snap) {
+            print(snap.data);
             if (snap.hasError || snap.data == null || snap.data.isEmpty)
               return Center(
                 child: Text('Empty'),
@@ -108,5 +122,12 @@ class _JournalState extends State<Journal> {
         ),
       ),
     );
+  }
+
+  void _import() async {
+    FilePickerResult result = await FilePicker.platform.pickFiles();
+    if (result != null) {
+      ReportFunctions.importReport(File(result.files.single.path));
+    }
   }
 }

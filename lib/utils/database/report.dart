@@ -60,11 +60,9 @@ class ReportFunctions {
 
   static Future<File> exportReport(String reportID, {String path}) async {
     // Either the permission was already granted before or the user just granted it.
-    File report = await ScientISSTdb.instance
-        .collection("history")
-        .document(reportID)
-        .export();
-    File files =
+    Directory report =
+        await Database._historyReference.document(reportID).export();
+    Directory files =
         await Database._reportsFilesReference.directory(reportID).export();
 
     final String folderPath = path ?? (await getTemporaryDirectory()).path;
@@ -72,12 +70,12 @@ class ReportFunctions {
     // Manually create a zip of a directory and individual files.
     final ZipFileEncoder encoder = ZipFileEncoder();
     encoder.create(filepath);
-    if (report != null) encoder.addFile(report);
-    if (files != null) encoder.addFile(files);
+    if (report != null) encoder.addDirectory(report);
+    if (files != null) encoder.addDirectory(files);
     encoder.close();
 
-    report?.deleteSync();
-    files?.deleteSync();
+    report?.delete(recursive: true);
+    files?.delete(recursive: true);
 
     return File(filepath);
   }
@@ -85,28 +83,46 @@ class ReportFunctions {
   static Future<void> importReport(File file) async {
     if (file.path.endsWith(".report.zip")) {
       final String id = file.path.split("/").last.split(".").first;
+      final String tmp = (await getTemporaryDirectory()).path + "/$id";
 
       final bytes = file.readAsBytesSync();
 
-      // Decode the Zip file
+      //Decode the Zip file
       final archive = ZipDecoder().decodeBytes(bytes);
 
-      // Extract the contents of the Zip archive to disk.
+      //Extract the contents of the Zip archive to disk.
       for (final file in archive) {
         final filename = file.name;
         if (file.isFile) {
-          final data = file.content as List<int>;
-          if (filename.endsWith(".db.zip")) {
-            ScientISSTdb.instance
-                .collection("history")
-                .importFromBytes(data, id);
-          } else if (filename.endsWith(".files.zip")) {
-            Database._reportsFilesReference.importFromBytes(data);
+          if (filename.startsWith("$id.db/")) {
+            final String filepath = "$tmp/" + filename;
+            _checkCreateDir(filepath);
+
+            final data = file.content as List<int>;
+            File(filepath).writeAsBytesSync(data);
+          } else if (filename.startsWith("$id.files/")) {
+            final String filepath = "$tmp/" + filename;
+            _checkCreateDir(filepath);
+
+            final data = file.content as List<int>;
+            File(filepath).writeAsBytesSync(data);
           }
         }
       }
+
+      await Database._historyReference.import(Directory("$tmp/$id.db"));
+      await Database._reportsFilesReference.import(Directory("$tmp/$id.files"));
+      Directory(tmp).deleteSync(recursive: true);
     } else {
       throw Exception("This is not a report");
     }
+  }
+
+  static void _checkCreateDir(String filepath) {
+    List<String> parts = filepath.split("/");
+    if (parts.length > 1) {
+      parts = parts.sublist(0, parts.length - 1);
+    }
+    Directory(parts.join("/")).createSync(recursive: true);
   }
 }

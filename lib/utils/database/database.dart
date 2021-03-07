@@ -18,16 +18,14 @@ class Database {
       ScientISSTdb.instance.files.directory("reports");
 
   static Stream<List<HistoryEntry>> getHistory() => _historyReference
-          .orderBy("timestamp", ascending: false)
-          .watchDocuments()
-          .map(
-        (List<DocumentSnapshot> docs) {
-          return List<HistoryEntry>.from(
-            docs.map(
-              (DocumentSnapshot doc) => HistoryEntry.fromDocument(doc),
-            ),
-          );
-        },
+      .orderBy("timestamp", descending: true)
+      .watchDocuments()
+      .map(
+        (List<DocumentSnapshot> docs) => List<HistoryEntry>.from(
+          docs.map(
+            (DocumentSnapshot doc) => HistoryEntry.fromDocument(doc),
+          ),
+        ),
       );
 
   static Future<void> deleteHistoryEntry(String id) async {

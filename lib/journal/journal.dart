@@ -79,7 +79,6 @@ class _JournalState extends State<Journal> {
         child: StreamBuilder(
           stream: Database.getHistory(),
           builder: (context, AsyncSnapshot<List<HistoryEntry>> snap) {
-            print(snap.data);
             if (snap.hasError || snap.data == null || snap.data.isEmpty)
               return Center(
                 child: Text('Empty'),

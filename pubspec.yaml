@@ -38,7 +38,7 @@ dependencies:
   intl: ^0.16.1 # DateTime format
   image: ^2.1.19 # Image handler
   archive: ^2.0.13 # Compress decompress
-  path_provider: ^1.6.27 # get local paths
+  path_provider: ^2.0.1 # get local paths
   file_picker: ^2.1.6 # pick a file
   permission_handler: ^5.1.0+2 # handle permissions
   share: ^0.6.5+4 # share files and stuff

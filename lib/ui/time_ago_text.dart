@@ -19,7 +19,11 @@ class _TimeAgoTextState extends State<TimeAgoText> {
     super.initState();
     Timer.periodic(Duration(minutes: 1), (Timer timer) {
       if (mounted) {
-        setState(() {});
+        try {
+          setState(() {});
+        } on Exception catch (e) {
+          print(e);
+        }
       } else {
         timer.cancel();
       }

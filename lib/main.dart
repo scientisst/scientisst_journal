@@ -9,13 +9,11 @@ void main() {
 
 class MyApp extends StatelessWidget {
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'ScientISST Journal',
-      theme: ThemeData(
-        primarySwatch: AppColors.primaryColor,
-      ),
-      home: HomePage(),
-    );
-  }
+  Widget build(BuildContext context) => MaterialApp(
+        title: 'ScientISST Journal',
+        theme: ThemeData(
+          primarySwatch: AppColors.primaryColor,
+        ),
+        home: HomePage(),
+      );
 }

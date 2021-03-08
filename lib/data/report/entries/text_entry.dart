@@ -8,7 +8,6 @@ class TextEntry extends ReportEntry {
           created: doc.data["created"],
           modified: doc.data["modified"],
           text: doc.data["text"],
-          type: "text",
         );
 
   String get text => _text;

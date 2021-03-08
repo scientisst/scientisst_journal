@@ -16,8 +16,11 @@ class __TimeSeriesCardState extends State<_TimeSeriesCard> {
   void initState() {
     super.initState();
     widget.entry.getData().then(
-          (List<List<SensorValue>> data) => setState(() => this.data = data),
-        );
+      (List<List<SensorValue>> data) {
+        this.data = data;
+        if (mounted) setState(() {});
+      },
+    );
   }
 
   @override

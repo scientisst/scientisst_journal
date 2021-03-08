@@ -15,7 +15,6 @@ abstract class FileEntry extends ReportEntry {
           reportID: reportID,
           id: id,
           text: text,
-          type: type,
           created: created,
           modified: modified,
         );

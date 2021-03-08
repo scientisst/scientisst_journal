@@ -14,17 +14,23 @@ class __ImageCardState extends State<_ImageCard> {
   @override
   void initState() {
     super.initState();
-    widget.entry
-        .getImage()
-        .then((File image) => setState(() => this.image = image));
+    widget.entry.getImage().then((File image) {
+      this.image = image;
+      if (mounted) setState(() {});
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return image != null
-        ? Container(
-            child: Image.file(image),
-          )
-        : Container();
+    return Container(
+      alignment: Alignment.center,
+      child: image != null
+          ? Image.file(image)
+          : SizedBox(
+              width: 32,
+              height: 32,
+              child: CircularProgressIndicator(),
+            ),
+    );
   }
 }

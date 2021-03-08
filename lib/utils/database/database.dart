@@ -18,7 +18,7 @@ class Database {
       ScientISSTdb.instance.files.directory("reports");
 
   static Stream<List<HistoryEntry>> getHistory() => _historyReference
-      .orderBy("timestamp", descending: true)
+      .orderBy("created", descending: true)
       .watchDocuments()
       .map(
         (List<DocumentSnapshot> docs) => List<HistoryEntry>.from(

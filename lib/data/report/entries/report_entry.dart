@@ -19,17 +19,15 @@ abstract class ReportEntry {
   DateTime created;
   DateTime modified;
   String _text;
-  String _type;
 
-  ReportEntry(
-      {@required this.reportID,
-      @required this.id,
-      @required this.created,
-      @required this.modified,
-      @required String text,
-      @required String type}) {
+  ReportEntry({
+    @required this.reportID,
+    @required this.id,
+    @required this.created,
+    @required this.modified,
+    @required String text,
+  }) {
     this._text = text;
-    this._type = type;
   }
 
   static String _getEntryType(DocumentSnapshot doc) =>

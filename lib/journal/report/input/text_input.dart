@@ -11,6 +11,7 @@ class TextInput extends StatefulWidget {
 
 class _TextInputState extends State<TextInput> {
   final TextEditingController controller = TextEditingController();
+  bool save = false;
 
   void _onPressed() {
     final String trimmedText = controller.text.trim();
@@ -31,6 +32,20 @@ class _TextInputState extends State<TextInput> {
               controller: controller,
               maxLines: 100,
               style: TextStyle(fontSize: 18),
+              onChanged: (String text) {
+                final String trimmed = text.trim();
+                if (trimmed.isNotEmpty) {
+                  if (!save)
+                    setState(() {
+                      save = true;
+                    });
+                } else {
+                  if (save)
+                    setState(() {
+                      save = false;
+                    });
+                }
+              },
               decoration: InputDecoration(hintText: "Add a note"),
             ),
           ),
@@ -38,10 +53,9 @@ class _TextInputState extends State<TextInput> {
         FlatButton(
           minWidth: double.infinity,
           height: 64,
-          color: Theme.of(context).primaryColor,
+          color: save ? Theme.of(context).primaryColor : Colors.grey[300],
           child: Icon(
             Icons.send,
-            color: Colors.white,
           ),
           onPressed: _onPressed,
         ),

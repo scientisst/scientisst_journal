@@ -1,16 +1,14 @@
-import 'package:flutter/material.dart';
-import 'package:scientisst_db/scientisst_db.dart';
-import 'package:scientisst_journal/data/history_entry.dart';
+part of '../history_entry.dart';
 
 class Report extends HistoryEntry {
-  Report({@required id, @required title, @required timestamp})
-      : super(id: id, type: "report", title: title, timestamp: timestamp);
+  Report({@required id, @required title, @required created})
+      : super(id: id, type: "report", title: title, created: created);
 
   Report.fromDocument(DocumentSnapshot doc)
       : super(
           id: doc.id,
           type: "report",
           title: doc.data["title"],
-          timestamp: doc.data["timestamp"],
+          created: doc.data["created"],
         );
 }

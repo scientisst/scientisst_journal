@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter_sensors/flutter_sensors.dart';
 import 'package:scientisst_journal/controllers/controller.dart';
-import 'package:scientisst_journal/data/sensor_options.dart';
-import 'package:scientisst_journal/data/sensor_value.dart';
+import 'package:scientisst_journal/data/sensors/sensor_options.dart';
+import 'package:scientisst_journal/data/sensors/sensor_value.dart';
 
 class LightController extends Controller {
   StreamSubscription subscription;

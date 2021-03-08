@@ -5,7 +5,7 @@ import 'package:scientisst_journal/charts/chart.dart';
 import 'package:scientisst_journal/controllers/accelerometer_controller.dart';
 import 'package:scientisst_journal/controllers/controller.dart';
 import 'package:scientisst_journal/controllers/light_controller.dart';
-import 'package:scientisst_journal/data/sensor_options.dart';
+import 'package:scientisst_journal/data/sensors/sensor_options.dart';
 
 const WINDOW_IN_SECONDS = 5;
 const FRAME_RATE = 30;
@@ -45,10 +45,10 @@ class _TestChartsState extends State<TestCharts> {
           switch (name) {
             case "accelerometer":
               final controller = AccelerometerController(
-                options: options,
                 bufferSizeSeconds: 5,
+                channels: [true, true, true],
               );
-              controller.start();
+              //controller.start();
               _controllers.add(controller);
               break;
             case "light":
@@ -56,7 +56,7 @@ class _TestChartsState extends State<TestCharts> {
                 options: options,
                 bufferSizeSeconds: 5,
               );
-              controller.start();
+              //controller.start();
               _controllers.add(controller);
               break;
             default:
@@ -70,9 +70,9 @@ class _TestChartsState extends State<TestCharts> {
   @override
   void dispose() {
     _refreshTimer?.cancel();
-    _controllers.forEach(
+    /*_controllers.forEach(
       (Controller controller) => controller.dispose(),
-    );
+    );*/
     super.dispose();
   }
 
@@ -90,9 +90,8 @@ class _TestChartsState extends State<TestCharts> {
                   (index) => Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      controller.options.channelsLabels != null
-                          ? Text(controller.options
-                              .channelsLabels[controller.channels[index]])
+                      controller.labels != null
+                          ? Text(controller.labels[controller.channels[index]])
                           : Container(),
                       SizedBox(
                         height: 200,
@@ -103,7 +102,7 @@ class _TestChartsState extends State<TestCharts> {
                 )..insert(
                     0,
                     Text(
-                      controller.options.name,
+                      controller.toString(),
                     ),
                   ),
               ),

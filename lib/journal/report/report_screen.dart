@@ -2,18 +2,21 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:scientisst_journal/data/history_entry.dart';
+import 'package:scientisst_journal/journal/report/input/accelerometer_input.dart';
+import 'package:scientisst_journal/journal/report/report_entries_list.dart';
 import 'package:share/share.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:buttons_tabbar/buttons_tabbar.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:scientisst_journal/data/report/report.dart';
-import 'package:scientisst_journal/data/report/report_entry.dart';
+import 'package:scientisst_journal/data/report/entries/report_entry.dart';
 import 'package:scientisst_journal/journal/report/cards/report_entry_card.dart';
 import 'package:scientisst_journal/journal/report/input/text_input.dart';
 import 'package:scientisst_journal/journal/report/input/camera_input.dart';
 import 'package:scientisst_journal/journal/report/input/image_input.dart';
 import 'package:scientisst_journal/utils/database/database.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 const ANIMATION_DURATION = Duration(milliseconds: 250);
 const BAR_MIN_HEIGHT = 88.0;
@@ -44,13 +47,21 @@ abstract class ReportScreenState extends State<ReportScreen> {
     Tab(
       icon: Icon(Icons.photo),
     ),
+    Tab(
+      icon: SvgPicture.asset(
+        "assets/icons/sensors/accelerometer.svg",
+        semanticsLabel: 'Accelerometer',
+        width: 28,
+        height: 28,
+        color: Colors.black,
+      ),
+    ),
   ];
   List<Widget> _tabViews;
   List<ReportEntry> _entries = [];
   StreamSubscription<List<ReportEntry>> _stream;
   ScrollController _scrollController = ScrollController();
   TabController _tabController;
-  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 }
 
 class _ReportScreenState extends ReportScreenState
@@ -66,6 +77,7 @@ class _ReportScreenState extends ReportScreenState
       TextInput(_addNote),
       CameraInput(_addImage),
       ImageInput(_addImage),
+      AccelerometerInput(_addAccelerometer),
     ];
     _titleController = TextEditingController(text: widget.report.title);
     _stream = ReportFunctions.getReportEntries(widget.report.id)
@@ -116,6 +128,14 @@ class _ReportScreenState extends ReportScreenState
     }
   }
 
+  Future<void> _addAccelerometer(File file, List<String> labels) async {
+    if (file != null && file.existsSync()) {
+      await ReportFunctions.addReportAccelerometer(
+          widget.report.id, file, labels);
+      file.delete();
+    }
+  }
+
   void _scrollToBottom() => _scrollController.animateTo(
         0,
         duration: Duration(milliseconds: 250),
@@ -125,7 +145,6 @@ class _ReportScreenState extends ReportScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _scaffoldKey,
       appBar: _appBar,
       body: SafeArea(
         child: LayoutBuilder(
@@ -170,17 +189,7 @@ class _ReportScreenState extends ReportScreenState
                     ),
                     height: halfHeight + _halfOffset,
                     duration: _animationDuration,
-                    child: ListView.builder(
-                      reverse: true,
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 8,
-                      ),
-                      itemCount: _entries.length,
-                      controller: _scrollController,
-                      itemBuilder: (context, index) => ReportEntryCard(
-                          _entries[_entries.length - 1 - index]),
-                    ),
+                    child: ReportEntriesList(_entries, _scrollController),
                   ),
                   Align(
                     alignment: Alignment.bottomCenter,
@@ -221,9 +230,8 @@ class _ReportScreenState extends ReportScreenState
                                 tabs: _tabs,
                                 contentPadding: EdgeInsets.zero,
                                 backgroundColor: Theme.of(context).primaryColor,
-                                unselectedBackgroundColor: Colors.grey[400],
-                                unselectedLabelStyle:
-                                    TextStyle(color: Colors.white),
+                                unselectedBackgroundColor: Colors.grey[300],
+                                labelStyle: TextStyle(color: Colors.black),
                                 duration: 150,
                               ),
                             ),
@@ -325,7 +333,7 @@ class _ReportScreenState extends ReportScreenState
       String result = await FilePicker.platform.getDirectoryPath();
       if (result != null) {
         await ReportFunctions.exportReport(widget.report.id, path: result);
-        _scaffoldKey.currentState.showSnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text("Saved!"),
           ),

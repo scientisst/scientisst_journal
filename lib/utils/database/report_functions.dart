@@ -11,25 +11,52 @@ class ReportFunctions {
       _reportEntires(reportID).watchDocuments().map(
             (List<DocumentSnapshot> docs) => List<ReportEntry>.from(
               docs.map(
-                (DocumentSnapshot doc) => ReportEntry.getEntry(doc),
+                (DocumentSnapshot doc) => ReportEntry.getEntry(doc, reportID),
               ),
             ),
           );
 
+  static Future<void> deleteEntry(String reportID, String entryID) async =>
+      await Database._historyReference
+          .document(reportID)
+          .collection("entries")
+          .document(entryID)
+          .delete();
+
   static Future<void> addReportNote(String reportID, String text) async {
+    final DateTime now = DateTime.now();
     await Database._historyReference
         .document(reportID)
         .collection("entries")
         .add(
       {
-        "timestamp": DateTime.now(),
+        "created": now,
+        "modified": now,
         "text": text,
         "type": "text",
       },
     );
   }
 
+  static Future<void> updateEntryText(
+      {@required String reportID,
+      @required String entryID,
+      @required String text}) async {
+    final DateTime now = DateTime.now();
+    await Database._historyReference
+        .document(reportID)
+        .collection("entries")
+        .document(entryID)
+        .update(
+      {
+        "modified": now,
+        "text": text,
+      },
+    );
+  }
+
   static Future<void> addReportImage(String reportID, Uint8List image) async {
+    final DateTime now = DateTime.now();
     final FileReference reference = await Database._reportsFilesReference
         .directory(reportID)
         .putBytes(image, "${ObjectId().id}.jpg");
@@ -38,20 +65,44 @@ class ReportFunctions {
         .collection("entries")
         .add(
       {
-        "timestamp": DateTime.now(),
-        "text": "caption",
-        "image": reference.path,
+        "created": now,
+        "modified": now,
+        "text": "",
+        "path": reference.path,
         "type": "image",
       },
     );
   }
 
-  static Future<void> changeTitle(String reportID, String title) async {
-    print(title);
-    await ScientISSTdb.instance
-        .collection("history")
+  static Future<void> addReportAccelerometer(
+          String reportID, File file, List<String> labels) async =>
+      _addReportTimeSeries(reportID, "accelerometer", file, labels: labels);
+
+  static Future<void> _addReportTimeSeries(
+      String reportID, String type, File file,
+      {List<String> labels}) async {
+    final DateTime now = DateTime.now();
+    final FileReference reference = Database._reportsFilesReference
+        .directory(reportID)
+        .file(file.path.split("/").last);
+    await reference.putFile(file);
+    await Database._historyReference
         .document(reportID)
-        .updateData(
+        .collection("entries")
+        .add(
+      {
+        "created": now,
+        "modified": now,
+        "text": "",
+        "path": reference.path,
+        "type": type,
+        "labels": labels,
+      },
+    );
+  }
+
+  static Future<void> changeTitle(String reportID, String title) async {
+    await ScientISSTdb.instance.collection("history").document(reportID).update(
       {
         "title": title,
       },

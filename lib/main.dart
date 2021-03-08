@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:scientisst_journal/homepage.dart';
+import 'package:scientisst_journal/values/app_colors.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -12,7 +13,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'ScientISST Journal',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: AppColors.primaryColor,
       ),
       home: HomePage(),
     );

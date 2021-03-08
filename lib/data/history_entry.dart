@@ -1,26 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:scientisst_db/scientisst_db.dart';
 
-class HistoryEntry {
+part 'report/report.dart';
+part 'study/study.dart';
+
+abstract class HistoryEntry {
   String id;
   String title;
-  DateTime timestamp;
+  DateTime created;
   String type;
 
   HistoryEntry(
       {@required this.id,
       @required this.type,
       @required this.title,
-      @required this.timestamp}) {
-    if (title != null) this.title = title;
+      @required this.created});
+
+  static HistoryEntry fromDocument(DocumentSnapshot doc) {
+    final String type = doc.data["type"];
+    if (type == "report") {
+      return Report.fromDocument(doc);
+    } else if (type == "study") {
+      return Study.fromDocument(doc);
+    } else {
+      throw Exception("Invalid history entry type");
+    }
   }
-
-  HistoryEntry.fromDocument(DocumentSnapshot doc)
-      : id = doc.id,
-        type = doc.data["type"],
-        title = doc.data["title"],
-        timestamp = doc.data["timestamp"];
-
-  bool get isReport => type == "report";
-  bool get isStudy => type == "study";
 }

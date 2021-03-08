@@ -30,19 +30,19 @@ dependencies:
   cupertino_icons: ^0.1.2
   flutter_sensors: ^0.1.6 # multiple sensors
   charts_flutter: ^0.9.0 # charts
-  scientisst_db:
+  scientisst_db: # local database
     path: ../scientisst_db
-  animate_icons: ^1.0.0
-  unicorndial: ^1.1.5
-  buttons_tabbar: ^1.1.1
-  camera: ^0.7.0+2
-  intl: ^0.16.1
-  image: ^2.1.19
-  archive: ^2.0.13
-  path_provider: ^1.6.27
-  file_picker: ^2.1.6
-  permission_handler: ^5.1.0+2
-  share: ^0.6.5+4
+  unicorndial: ^1.1.5 # floatingActionButton
+  buttons_tabbar: ^1.1.1 # tabbar
+  camera: ^0.7.0+2 # camera
+  intl: ^0.16.1 # DateTime format
+  image: ^2.1.19 # Image handler
+  archive: ^2.0.13 # Compress decompress
+  path_provider: ^1.6.27 # get local paths
+  file_picker: ^2.1.6 # pick a file
+  permission_handler: ^5.1.0+2 # handle permissions
+  share: ^0.6.5+4 # share files and stuff
+  flutter_svg: ^0.19.3 # show svg icons
 
 dev_dependencies:
   flutter_test:
@@ -60,7 +60,9 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
+  assets:
+    - assets/icons/sensors/
+
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 

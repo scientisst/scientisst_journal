@@ -68,8 +68,7 @@ class _ImageInputState extends State<ImageInput> {
                   ],
                 )
               : Center(
-                  child:
-                      Icon(Icons.image_not_supported, color: Colors.grey[300]),
+                  child: Icon(Icons.image_not_supported, color: Colors.grey),
                 ),
         ),
         FlatButton(
@@ -78,7 +77,6 @@ class _ImageInputState extends State<ImageInput> {
           color: Theme.of(context).primaryColor,
           child: Icon(
             _image != null ? Icons.add : Icons.image_search,
-            color: Colors.white,
           ),
           onPressed: _onPressed,
         ),

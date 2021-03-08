@@ -1,14 +1,14 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:flutter/material.dart';
 import 'package:scientisst_db/scientisst_db.dart';
 import 'package:scientisst_journal/data/history_entry.dart';
-import 'package:scientisst_journal/data/report/report.dart';
-import 'package:scientisst_journal/data/report/report_entry.dart';
+import 'package:scientisst_journal/data/report/entries/report_entry.dart';
 import 'package:archive/archive_io.dart';
 import 'package:path_provider/path_provider.dart';
 
-part 'report.dart';
+part 'report_functions.dart';
 
 class Database {
   static CollectionReference get _historyReference =>
@@ -46,12 +46,16 @@ class Database {
       {
         "title": title,
         "type": "report",
-        "timestamp": now,
+        "created": now,
+        "modified": now,
       },
     );
-    return Report(id: doc.id, title: title, timestamp: now);
+    return Report(id: doc.id, title: title, created: now);
   }
 
   static Future<File> getFile(String path) async =>
       await ScientISSTdb.instance.files.file(path).getFile();
+
+  static Future<void> deleteFile(String path) async =>
+      await ScientISSTdb.instance.files.file(path).delete();
 }

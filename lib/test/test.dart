@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:scientisst_journal/data/sensor_options.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:scientisst_journal/data/sensors/sensor_options.dart';
 import 'package:scientisst_journal/test/test_charts.dart';
 import 'package:scientisst_journal/ui/sensor_button.dart';
 import 'package:scientisst_journal/ui/sensor_options_dialog.dart';
@@ -47,7 +48,13 @@ class _TestState extends State<Test> {
         children: [
           _buildButton(
             options: _sensorsOptions["accelerometer"],
-            icon: Icon(Icons.extension_rounded),
+            icon: SvgPicture.asset(
+              "assets/icons/sensors/accelerometer.svg",
+              semanticsLabel: 'Accelerometer',
+              color: Colors.white,
+              width: 28,
+              height: 28,
+            ),
             disabledIcon: Icon(Icons.extension_outlined),
             color: Colors.blue,
             onLongPress: _showAccelerometerOptions,

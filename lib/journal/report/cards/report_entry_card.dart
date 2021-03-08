@@ -1,11 +1,15 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:scientisst_journal/data/report/report_entry.dart';
+import 'package:scientisst_journal/charts/chart.dart';
+import 'package:scientisst_journal/data/report/entries/report_entry.dart';
+import 'package:scientisst_journal/data/sensors/sensor_value.dart';
+import 'package:scientisst_journal/journal/report/input/edit_text_screen.dart';
+import 'package:scientisst_journal/ui/time_ago_text.dart';
 
 part 'text_card.dart';
 part 'image_card.dart';
+part 'timeseries_card.dart';
 
 class ReportEntryCard extends StatelessWidget {
   const ReportEntryCard(this.entry, {Key key}) : super(key: key);
@@ -17,10 +21,18 @@ class ReportEntryCard extends StatelessWidget {
     List<Widget> children = [];
 
     Widget content;
-    if (entry.isText)
-      content = _TextCard(entry as TextEntry);
-    else if (entry.isImage) content = _ImageCard(entry as ImageEntry);
-
+    if (entry is TextEntry)
+      content = _TextCard(entry);
+    else if (entry is ImageEntry)
+      content = _ImageCard(entry);
+    else if (entry is TimeSeriesEntry) {
+      final Map<String, MaterialColor> accelerometerColors = {
+        "X": Colors.red,
+        "Y": Colors.green,
+        "Z": Colors.blue
+      };
+      content = _TimeSeriesCard(entry, colormap: accelerometerColors);
+    }
     children.add(
       Padding(
         padding: EdgeInsets.only(
@@ -31,7 +43,7 @@ class ReportEntryCard extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            _buildTimestamp(entry.timestamp),
+            TimeAgoText(entry.modified),
             _buildOptions(),
           ],
         ),
@@ -52,21 +64,6 @@ class ReportEntryCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: children,
-      ),
-    );
-  }
-
-  Widget _buildTimestamp(DateTime timestamp) {
-    String time;
-    final Duration difference = DateTime.now().difference(timestamp);
-    if (difference.inMinutes >= 60) {
-      time = DateFormat.Hms().format(timestamp);
-    } else {
-      time = "${difference.inMinutes} min ago";
-    }
-    return Container(
-      child: Text(
-        time,
       ),
     );
   }

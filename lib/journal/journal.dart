@@ -1,9 +1,8 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:scientisst_db/scientisst_db.dart';
+import 'package:intl/intl.dart';
 import 'dart:io';
 import 'package:scientisst_journal/data/history_entry.dart';
-import 'package:scientisst_journal/data/report/report.dart';
 import 'package:scientisst_journal/journal/report/report_screen.dart';
 import 'package:scientisst_journal/utils/database/database.dart';
 import 'package:unicorndial/unicorndial.dart';
@@ -93,16 +92,18 @@ class _JournalState extends State<Journal> {
                       entry.title,
                     ),
                     subtitle: Text(
-                      entry.timestamp.toString(),
+                      DateFormat('yyyy-MM-dd HH:mm').format(entry.created),
                     ),
                     onTap: () async {
                       Widget page;
-                      if (entry.isReport) {
+                      if (entry is Report) {
                         page = ReportScreen(
                             await ReportFunctions.getReport(entry.id));
-                      } else if (entry.isStudy) {
+                      } else if (entry is Study) {
                         //page = ReportWidget(await Database.getReport(entry.id));
                         page = Container();
+                      } else {
+                        return;
                       }
                       Navigator.of(context).push(
                         MaterialPageRoute(

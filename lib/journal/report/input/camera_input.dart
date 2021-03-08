@@ -127,7 +127,7 @@ class _CameraInputState extends State<CameraInput> {
                   minWidth: double.infinity,
                   height: 64,
                   color: _takingPhoto
-                      ? Colors.grey
+                      ? Colors.grey[300]
                       : Theme.of(context).primaryColor,
                   child: _takingPhoto
                       ? SizedBox(
@@ -135,13 +135,12 @@ class _CameraInputState extends State<CameraInput> {
                           height: 28,
                           child: CircularProgressIndicator(
                             valueColor: AlwaysStoppedAnimation<Color>(
-                              Colors.white,
+                              Colors.black,
                             ),
                           ),
                         )
                       : Icon(
                           Icons.camera,
-                          color: Colors.white,
                         ),
                   onPressed: _onPressed,
                 ),

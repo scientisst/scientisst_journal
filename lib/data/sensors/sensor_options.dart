@@ -7,7 +7,7 @@ class SensorOptions {
 
   SensorOptions({
     this.name,
-    this.channels = const [false],
+    this.channels = const [true],
     this.channelsLabels,
     this.samplingRate,
   }) {

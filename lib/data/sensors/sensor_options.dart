@@ -1,32 +1,24 @@
+import 'package:flutter/material.dart';
+
 class SensorOptions {
-  List<bool> channels;
-  final String name;
-  final List<String> channelsLabels;
-  bool active;
-  int samplingRate;
+  final List<String> units;
+  final List<String> label;
+  List<String> column;
+  final String deviceName;
+  final List<int> channels;
 
   SensorOptions({
-    this.name,
-    this.channels = const [true],
-    this.channelsLabels,
-    this.samplingRate,
-  }) {
-    if (channelsLabels != null)
-      assert(channels.length == channelsLabels.length);
-    _updateActive();
-  }
+    @required this.units,
+    @required this.label,
+    @required this.channels,
+    @required this.deviceName,
+  }) : assert(channels != null && channels.length > 0);
 
-  void toggle() {
-    active = !active;
-    channels = List<bool>.from(channels.map((_) => active));
-  }
+  SensorOptions.fromMap(Map<String, dynamic> map)
+      : units = List<String>.from(map["units"]),
+        channels = List<int>.from(map["channels"]),
+        label = List<String>.from(map["label"]),
+        deviceName = map["device_name"];
 
-  void toggleChannel(int index) {
-    channels[index] = !channels[index];
-    _updateActive();
-  }
-
-  void _updateActive() {
-    active = channels.any((active) => active);
-  }
+  int get nrChannels => channels.length;
 }

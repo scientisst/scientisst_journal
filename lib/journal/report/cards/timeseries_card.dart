@@ -33,12 +33,17 @@ class __TimeSeriesCardState extends State<_TimeSeriesCard> {
         ),
       );
     }
-    return data != null
-        ? Container(
-            height: 256,
-            padding: EdgeInsets.only(left: 8, right: 8, bottom: 8),
-            child: Chart(data, colors: colors),
-          )
-        : Container();
+    return Container(
+      height: 256,
+      alignment: Alignment.center,
+      padding: EdgeInsets.only(left: 12, right: 12, bottom: 16),
+      child: data != null
+          ? Chart(data, colors: colors)
+          : SizedBox(
+              width: 32,
+              height: 32,
+              child: CircularProgressIndicator(),
+            ),
+    );
   }
 }

@@ -17,10 +17,12 @@ class AccelerometerController extends Controller
       : super(
           bufferSizeSeconds: bufferSizeSeconds,
           channels: channels,
-          labels: ["X", "Y", "Z"],
+          labels: ["x", "y", "z"],
+          units: ["m/s2", "m/s2", "m/s2"],
+          deviceName: "accelerometer",
         ) {
     data = List<List<SensorValue>>.generate(
-      this.channels.length,
+      nrChannels,
       (_) => <SensorValue>[],
     );
   }
@@ -39,7 +41,7 @@ class AccelerometerController extends Controller
       _timestamp = DateTime.now();
       _clearData(_timestamp);
 
-      for (int i = 0; i < channels.length; i++) {
+      for (int i = 0; i < nrChannels; i++) {
         data[i].add(
           SensorValue(
             _timestamp,
@@ -62,7 +64,7 @@ class AccelerometerController extends Controller
         timestamp.millisecondsSinceEpoch -
                 data.first.first.timestamp.millisecondsSinceEpoch >
             bufferSizeSeconds * 1000) {
-      for (int i = 0; i < channels.length; i++) {
+      for (int i = 0; i < nrChannels; i++) {
         data[i].removeAt(0);
       }
     }

@@ -1,0 +1,9 @@
+{
+  "units": ["m/s2", "m/s2", "m/s2"],
+  "device name": "accelerometer",
+  "column": ["timestamp", "a1", "a2", "a3"],
+  "time": "14:21:22:178",
+  "date": "2017-4-18",
+  "microsecondsSinceEpoch": 123456789,
+  "label": ["X", "Y", "Z"]
+}

@@ -17,12 +17,12 @@ class LightController extends Controller {
   final int bufferSizeSeconds;
 
   LightController({this.options, this.bufferSizeSeconds = 5}) {
-    this.channels = List<int>.from(
-      List.generate(options.channels.length,
-              (index) => options.channels[index] ? index : null)
-          .where((index) => index != null),
-    );
-    this.samplingRate = options.samplingRate ?? 50;
+    //this.channels = List<int>.from(
+    //List.generate(options.channels.length,
+    //(index) => options.channels[index] ? index : null)
+    //.where((index) => index != null),
+    //);
+    //this.samplingRate = options.samplingRate ?? 50;
 
     _t = 1000 ~/ samplingRate;
     _n = samplingRate * bufferSizeSeconds;

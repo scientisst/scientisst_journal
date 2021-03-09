@@ -44,10 +44,17 @@ dependencies:
   permission_handler: ^5.1.0+2 # handle permissions
   share: ^0.6.5+4 # share files and stuff
   flutter_svg: ^0.19.3 # show svg icons
+  url_launcher: ^6.0.2 # launch URIs and URLs
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: ^0.8.1
+
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/launcher_icon/icon.png"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

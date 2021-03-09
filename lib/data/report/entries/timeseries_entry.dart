@@ -22,5 +22,5 @@ class TimeSeriesEntry extends FileEntry {
         );
 
   Future<List<List<SensorValue>>> getData() async =>
-      Utils.parseCSV(await Database.getFile(path));
+      Utils.parseTimeSeries(await Database.getFile(path));
 }

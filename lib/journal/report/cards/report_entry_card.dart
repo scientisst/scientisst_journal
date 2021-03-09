@@ -27,9 +27,9 @@ class ReportEntryCard extends StatelessWidget {
       content = _ImageCard(entry);
     else if (entry is TimeSeriesEntry) {
       final Map<String, MaterialColor> accelerometerColors = {
-        "X": Colors.red,
-        "Y": Colors.green,
-        "Z": Colors.blue
+        "x": Colors.red,
+        "y": Colors.green,
+        "z": Colors.blue
       };
       content = _TimeSeriesCard(entry, colormap: accelerometerColors);
     }

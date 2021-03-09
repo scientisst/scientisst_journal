@@ -3,7 +3,9 @@ import 'dart:io';
 import 'dart:convert';
 
 import 'package:intl/intl.dart';
+import 'package:scientisst_journal/data/sensors/sensor_options.dart';
 import 'package:scientisst_journal/data/sensors/sensor_value.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Utils {
   static String getTimeAgo(DateTime timestamp) {
@@ -15,12 +17,13 @@ class Utils {
     }
   }
 
-  static Future<List<List<SensorValue>>> parseCSV(File file) async {
+  static Future<List<List<SensorValue>>> parseTimeSeries(File file) async {
+    assert(file.path.endsWith(".txt"));
     bool header = true;
-    bool first = false;
     List<List<SensorValue>> data;
     int start;
     int nrChannels;
+    SensorOptions options;
     await file
         .openRead()
         .map(utf8.decode)
@@ -29,16 +32,14 @@ class Utils {
       (String line) {
         if (header) {
           header = false;
-          first = true;
-          nrChannels = line.split(",").length - 2;
+          Map<String, dynamic> map = jsonDecode(line.substring(1));
+          options = SensorOptions.fromMap(map);
+          start = map["microsecondsSinceEpoch"];
+          nrChannels = options.nrChannels;
           data = List.generate(nrChannels, (_) => <SensorValue>[]);
         } else {
           Iterable<num> fields =
-              line.split(",").map((String field) => num.tryParse(field));
-          if (first) {
-            first = false;
-            start = fields.last.toInt();
-          }
+              line.split("\t").map((String field) => num.tryParse(field));
           for (int i = 0; i < nrChannels; i++) {
             data[i].add(
               SensorValue(
@@ -53,4 +54,7 @@ class Utils {
     );
     return data;
   }
+
+  static Future<void> launchURL(String url) async =>
+      await canLaunch(url) ? await launch(url) : throw 'Could not launch $url';
 }

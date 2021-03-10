@@ -1,6 +1,7 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:scientisst_db/scientisst_db.dart';
 import 'dart:io';
 import 'package:scientisst_journal/data/history_entry.dart';
 import 'package:scientisst_journal/journal/report/report_screen.dart';
@@ -41,7 +42,7 @@ class _JournalState extends State<Journal> {
           onPressed: _newReport,
         ),
       ),
-      UnicornButton(
+      /*UnicornButton(
         hasLabel: true,
         labelText: "Study",
         currentButton: FloatingActionButton(
@@ -50,7 +51,7 @@ class _JournalState extends State<Journal> {
           child: Icon(Icons.integration_instructions),
           onPressed: () {},
         ),
-      ),
+      ),*/
     ];
   }
 
@@ -65,7 +66,6 @@ class _JournalState extends State<Journal> {
 
   @override
   Widget build(BuildContext context) {
-    //ScientISSTdb.clearDatabase();
     return Scaffold(
       floatingActionButton: UnicornDialer(
           hasBackground: false,
@@ -110,10 +110,6 @@ class _JournalState extends State<Journal> {
                           builder: (context) => page,
                         ),
                       );
-                    },
-                    onLongPress: () async {
-                      await Database.deleteHistoryEntry(entry.id);
-                      setState(() {});
                     },
                   );
                 },

@@ -2,10 +2,10 @@
     package="com.scientisst.journal">
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.CAMERA" />
    <application
-        android:label="ScientISST Journal"
-       android:icon="@mipmap/launcher_icon"
-       android:requestLegacyExternalStorage="true">
+       android:label="ScientISST Journal"
+       android:icon="@mipmap/launcher_icon">
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"

@@ -10,6 +10,6 @@ class AccelerometerEntry extends TimeSeriesEntry {
           text: doc.data["text"],
           type: "accelerometer",
           path: doc.data["path"],
-          labels: doc.data["labels"],
+          labels: List<String>.from(doc.data["labels"]),
         );
 }

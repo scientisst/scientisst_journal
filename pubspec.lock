@@ -369,9 +369,9 @@ packages:
   scientisst_db:
     dependency: "direct main"
     description:
-      name: scientisst_db
-      url: "https://pub.dartlang.org"
-    source: hosted
+      path: "../scientisst_db"
+      relative: true
+    source: path
     version: "0.0.3"
   share:
     dependency: "direct main"

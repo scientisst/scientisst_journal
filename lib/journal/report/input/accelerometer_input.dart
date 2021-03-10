@@ -107,27 +107,34 @@ class _AccelerometerInputState extends State<AccelerometerInput> {
                   ),
                 ),
               ),
-              SingleChildScrollView(
-                physics: NeverScrollableScrollPhysics(),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: List.generate(
-                    axis.length,
-                    (int index) => RawMaterialButton(
-                      fillColor: axis[index] ? COLORS[index] : Colors.grey,
-                      shape: CircleBorder(),
-                      child: Text(
-                        _controller.labels[index],
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+              IgnorePointer(
+                ignoring: _recording,
+                child: SingleChildScrollView(
+                  physics: NeverScrollableScrollPhysics(),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: List.generate(
+                      axis.length,
+                      (int index) => RawMaterialButton(
+                        fillColor: axis[index]
+                            ? (_recording
+                                ? COLORS[index].withOpacity(0.5)
+                                : COLORS[index])
+                            : Colors.grey,
+                        shape: CircleBorder(),
+                        child: Text(
+                          _controller.labels[index],
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
                         ),
+                        onPressed: () {
+                          axis[index] = !axis[index];
+                          initController();
+                          setState(() {});
+                        },
                       ),
-                      onPressed: () {
-                        axis[index] = !axis[index];
-                        initController();
-                        setState(() {});
-                      },
                     ),
                   ),
                 ),

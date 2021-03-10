@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:flutter/cupertino.dart';
 import 'package:scientisst_journal/data/history_entry.dart';
 import 'package:scientisst_journal/journal/report/input/accelerometer_input.dart';
 import 'package:scientisst_journal/journal/report/report_entries_list.dart';
@@ -154,7 +155,7 @@ class _ReportScreenState extends ReportScreenState
               if (_halfOffset < -halfHeight / 2) {
                 _halfOffset = -halfHeight;
               } else if (_halfOffset >= halfHeight / 2) {
-                FocusScope.of(context).unfocus();
+                if (!_editTitle) FocusScope.of(context).unfocus();
                 _halfOffset = halfHeight;
               } else {
                 _halfOffset = 0;
@@ -262,14 +263,13 @@ class _ReportScreenState extends ReportScreenState
                 controller: _titleController,
                 focusNode: _titleFocus,
                 style: TextStyle(
-                  color: Colors.white,
                   fontWeight: FontWeight.bold,
                   fontSize: 20,
                 ),
                 cursorColor: Colors.white,
                 decoration: InputDecoration.collapsed(hintText: ""),
               )
-            : Text(_titleController.text),
+            : Text(_titleController.text.trim()),
         actions: [
           IconButton(
             icon: Icon(_editTitle ? Icons.check : Icons.edit),
@@ -279,26 +279,33 @@ class _ReportScreenState extends ReportScreenState
         ],
       );
 
-  PopupMenuButton get _optionsMenu => PopupMenuButton<String>(
+  PopupMenuButton get _optionsMenu => PopupMenuButton<Function>(
         icon: Icon(
           Icons.more_vert,
         ),
-        onSelected: _performAction,
-        itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-          PopupMenuItem<String>(
-            value: "save as",
+        onSelected: (function) => function(),
+        itemBuilder: (BuildContext context) => <PopupMenuEntry<Function>>[
+          PopupMenuItem<Function>(
+            value: _saveAs,
             child: _optionsEntry(
               "Save As",
               Icon(Icons.save),
             ),
           ),
-          PopupMenuItem<String>(
-            value: "export",
+          PopupMenuItem<Function>(
+            value: _export,
             child: _optionsEntry(
               "Share",
               Icon(Icons.share),
             ),
           ),
+          PopupMenuItem<Function>(
+            value: _delete,
+            child: _optionsEntry(
+              "Delete",
+              Icon(Icons.delete),
+            ),
+          )
         ],
       );
 
@@ -314,19 +321,6 @@ class _ReportScreenState extends ReportScreenState
           Text(text)
         ],
       );
-
-  void _performAction(String action) {
-    switch (action) {
-      case "export":
-        _export();
-        return;
-      case "save as":
-        _saveAs();
-        return;
-      default:
-        return;
-    }
-  }
 
   Future<void> _saveAs() async {
     if (await Permission.storage.request().isGranted) {
@@ -347,5 +341,36 @@ class _ReportScreenState extends ReportScreenState
   Future<void> _export() async {
     File file = await ReportFunctions.exportReport(widget.report.id);
     Share.shareFiles([file.path], text: _titleController.text.trim());
+  }
+
+  Future<void> _delete() async {
+    final bool delete = await showDialog(
+          context: context,
+          builder: (context) => CupertinoAlertDialog(
+            title: Text("Delete Report"),
+            content: Text("This data will be permanently lost."),
+            actions: [
+              CupertinoDialogAction(
+                child: Text(
+                  "Cancel",
+                ),
+                isDefaultAction: true,
+                onPressed: () => Navigator.of(context).pop(false),
+              ),
+              CupertinoDialogAction(
+                child: Text(
+                  "Delete",
+                ),
+                isDestructiveAction: true,
+                onPressed: () => Navigator.of(context).pop(true),
+              ),
+            ],
+          ),
+        ) ??
+        false;
+    if (delete) {
+      Navigator.of(context).popUntil((Route route) => route.isFirst);
+      Database.deleteHistoryEntry(widget.report.id);
+    }
   }
 }

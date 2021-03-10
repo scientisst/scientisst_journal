@@ -41,7 +41,7 @@ class Database {
 
   static Future<Report> newReport() async {
     final DateTime now = DateTime.now();
-    final String title = "Experiência sem título";
+    final String title = "Untitled Experiment";
     final DocumentReference doc = await _historyReference.add(
       {
         "title": title,

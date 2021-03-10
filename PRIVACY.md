@@ -1,4 +1,4 @@
-**Privacy Policy**
+# Privacy Policy
 
 ScientISST built the ScientISST Journal app as a Free app. This SERVICE is provided by ScientISST at no cost and is intended for use as is.
 
@@ -60,3 +60,5 @@ This policy is effective as of 2021-03-10
 **Contact Us**
 
 If you have any questions or suggestions about our Privacy Policy, do not hesitate to contact us at info@scientisst.com.
+
+ScientISST - https://scientisst.com/ - 2021

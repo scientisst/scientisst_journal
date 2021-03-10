@@ -2,8 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:scientisst_journal/journal/journal.dart';
-import 'package:scientisst_journal/test/test.dart';
+//import 'package:scientisst_journal/test/test.dart';
 import 'package:scientisst_journal/settings/settings.dart';
+import 'package:scientisst_journal/values/app_colors.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key key}) : super(key: key);
@@ -13,17 +14,21 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int _index = 1;
+  int _index = 0;
   StreamSubscription subscription;
 
   final _items = <BottomNavigationBarItem>[
-    BottomNavigationBarItem(
-        icon: Icon(Icons.stacked_line_chart), label: "Test"),
+    /*BottomNavigationBarItem(
+        icon: Icon(Icons.stacked_line_chart), label: "Test"),*/
     BottomNavigationBarItem(icon: Icon(Icons.graphic_eq), label: "Journal"),
     BottomNavigationBarItem(icon: Icon(Icons.settings), label: "Settings"),
   ];
 
-  final _children = <Widget>[Test(), Journal(), Settings()];
+  final _children = <Widget>[
+    //Test(),
+    Journal(),
+    Settings(),
+  ];
 
   @override
   void dispose() {
@@ -45,6 +50,7 @@ class _HomePageState extends State<HomePage> {
         currentIndex: _index,
         items: _items,
         onTap: (int index) => setState(() => _index = index),
+        selectedItemColor: AppColors.primaryColor.shade600,
       ),
     );
   }

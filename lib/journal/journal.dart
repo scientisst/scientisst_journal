@@ -1,7 +1,11 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:scientisst_db/scientisst_db.dart';
-import 'package:scientisst_journal/data/report.dart';
-import 'package:scientisst_journal/journal/reportWidget.dart';
+import 'dart:io';
+import 'package:scientisst_journal/data/history_entry.dart';
+import 'package:scientisst_journal/journal/report/report_screen.dart';
+import 'package:scientisst_journal/utils/database/database.dart';
 import 'package:unicorndial/unicorndial.dart';
 
 class Journal extends StatefulWidget {
@@ -20,6 +24,16 @@ class _JournalState extends State<Journal> {
     childButtons = [
       UnicornButton(
         hasLabel: true,
+        labelText: "Import",
+        currentButton: FloatingActionButton(
+          heroTag: null,
+          mini: true,
+          child: Icon(Icons.download_rounded),
+          onPressed: _import,
+        ),
+      ),
+      UnicornButton(
+        hasLabel: true,
         labelText: "Report",
         currentButton: FloatingActionButton(
           heroTag: null,
@@ -28,7 +42,7 @@ class _JournalState extends State<Journal> {
           onPressed: _newReport,
         ),
       ),
-      UnicornButton(
+      /*UnicornButton(
         hasLabel: true,
         labelText: "Study",
         currentButton: FloatingActionButton(
@@ -37,24 +51,15 @@ class _JournalState extends State<Journal> {
           child: Icon(Icons.integration_instructions),
           onPressed: () {},
         ),
-      ),
+      ),*/
     ];
   }
 
   Future<void> _newReport() async {
-    final DateTime now = DateTime.now();
-    DocumentReference doc =
-        await ScientISSTdb.instance.collection("history").add(
-      {
-        "type": "report",
-        "timestamp": now,
-      },
-    );
+    Report report = await Database.newReport();
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => ReportWidget(
-          Report(id: doc.id, timestamp: now),
-        ),
+        builder: (context) => ReportScreen(report),
       ),
     );
   }
@@ -70,63 +75,55 @@ class _JournalState extends State<Journal> {
           parentButton: Icon(Icons.add),
           childButtons: childButtons),
       body: SafeArea(
-        child: FutureBuilder(
-          future: ScientISSTdb.instance
-              .collection("history")
-              .orderBy("timestamp", ascending: false)
-              .where("title", isEqualTo: "Experiência s")
-              .getDocuments(),
-          builder: (context, AsyncSnapshot<List<DocumentSnapshot>> snap) =>
-              RefreshIndicator(
-            onRefresh: () {
-              setState(() {});
-              return Future.value(null);
-            },
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                if (snap.hasError || snap.data == null || snap.data.isEmpty)
-                  return SingleChildScrollView(
-                    physics: AlwaysScrollableScrollPhysics(),
-                    child: Container(
-                      height: constraints.maxHeight,
-                      alignment: Alignment.center,
-                      child: Text('Empty'),
+        child: StreamBuilder(
+          stream: Database.getHistory(),
+          builder: (context, AsyncSnapshot<List<HistoryEntry>> snap) {
+            if (snap.hasError || snap.data == null || snap.data.isEmpty)
+              return Center(
+                child: Text('Empty'),
+              );
+            else
+              return ListView.builder(
+                itemCount: snap.data.length,
+                itemBuilder: (context, index) {
+                  final HistoryEntry entry = snap.data[index];
+                  return ListTile(
+                    title: Text(
+                      entry.title,
                     ),
-                  );
-                else
-                  return ListView(
-                    children: List<ListTile>.from(
-                      snap.data.map(
-                        (DocumentSnapshot doc) {
-                          final Report report = Report.fromDocument(doc);
-                          return ListTile(
-                            title: Text(
-                              report.title,
-                            ),
-                            subtitle: Text(
-                              report.timestamp.toString(),
-                            ),
-                            onTap: () => Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => ReportWidget(
-                                  Report.fromDocument(doc),
-                                ),
-                              ),
-                            ),
-                            onLongPress: () {
-                              doc.reference.delete();
-                              setState(() {});
-                            },
-                          );
-                        },
-                      ),
+                    subtitle: Text(
+                      DateFormat('yyyy-MM-dd HH:mm').format(entry.created),
                     ),
+                    onTap: () async {
+                      Widget page;
+                      if (entry is Report) {
+                        page = ReportScreen(
+                            await ReportFunctions.getReport(entry.id));
+                      } else if (entry is Study) {
+                        //page = ReportWidget(await Database.getReport(entry.id));
+                        page = Container();
+                      } else {
+                        return;
+                      }
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => page,
+                        ),
+                      );
+                    },
                   );
-              },
-            ),
-          ),
+                },
+              );
+          },
         ),
       ),
     );
+  }
+
+  void _import() async {
+    FilePickerResult result = await FilePicker.platform.pickFiles();
+    if (result != null) {
+      ReportFunctions.importReport(File(result.files.single.path));
+    }
   }
 }

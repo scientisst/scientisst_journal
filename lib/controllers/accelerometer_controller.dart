@@ -1,76 +1,95 @@
 import 'dart:async';
+import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_sensors/flutter_sensors.dart';
 import 'package:scientisst_journal/controllers/controller.dart';
-import 'package:scientisst_journal/data/sensor_options.dart';
-import 'package:scientisst_journal/data/sensor_value.dart';
+import 'package:scientisst_journal/controllers/controller_interface.dart';
+import 'package:scientisst_journal/data/sensors/sensor_value.dart';
 
-class AccelerometerController extends Controller {
-  StreamSubscription subscription;
-  List<int> channels;
-  int samplingRate;
-  int _t;
+class AccelerometerController extends Controller
+    implements ControllerInterface {
   DateTime _timestamp;
   List data = [];
-  final SensorOptions options;
-  final int bufferSizeSeconds;
-  int _n;
 
-  AccelerometerController({this.options, this.bufferSizeSeconds = 5}) {
-    this.channels = List<int>.from(
-      List.generate(options.channels.length,
-              (index) => options.channels[index] ? index : null)
-          .where((index) => index != null),
+  AccelerometerController(
+      {@required List<bool> channels, int bufferSizeSeconds = 5})
+      : super(
+          bufferSizeSeconds: bufferSizeSeconds,
+          channels: channels,
+          labels: ["x", "y", "z"],
+          units: ["m/s2", "m/s2", "m/s2"],
+          deviceName: "accelerometer",
+        ) {
+    data = List<List<SensorValue>>.generate(
+      nrChannels,
+      (_) => <SensorValue>[],
     );
-    this.samplingRate = options.samplingRate ?? 17;
-
-    _t = 1000 ~/ samplingRate;
-    _n = samplingRate * bufferSizeSeconds;
   }
 
-  void start() async {
-    final stream = await SensorManager().sensorUpdates(
+  Stream<List<List<SensorValue>>> listen({int refreshRate = 30}) async* {
+    double interval = (refreshRate != null ? 1000 / refreshRate : 0);
+
+    DateTime lastRefresh = DateTime.now();
+    yield data;
+
+    final Stream<SensorEvent> stream = await SensorManager().sensorUpdates(
       sensorId: Sensors.ACCELEROMETER,
       interval: Sensors.SENSOR_DELAY_FASTEST,
     );
-    _timestamp = DateTime.now();
-    _clearData();
+    await for (SensorEvent sensorEvent in stream) {
+      _timestamp = DateTime.now();
+      _clearData(_timestamp);
+
+      for (int i = 0; i < nrChannels; i++) {
+        data[i].add(
+          SensorValue(
+            _timestamp,
+            sensorEvent.data[channels[i]],
+          ),
+        );
+      }
+
+      if (_timestamp.millisecondsSinceEpoch -
+              lastRefresh.millisecondsSinceEpoch >=
+          interval) {
+        lastRefresh = _timestamp;
+        yield data.toList();
+      }
+    }
+  }
+
+  Future<void> _clearData(DateTime timestamp) async {
+    while (data.first.isNotEmpty &&
+        timestamp.millisecondsSinceEpoch -
+                data.first.first.timestamp.millisecondsSinceEpoch >
+            bufferSizeSeconds * 1000) {
+      for (int i = 0; i < nrChannels; i++) {
+        data[i].removeAt(0);
+      }
+    }
+  }
+
+  Future<void> record({String path}) async {
+    await super.record();
+    Stream<SensorEvent> stream = await SensorManager().sensorUpdates(
+      sensorId: Sensors.ACCELEROMETER,
+      interval: Sensors.SENSOR_DELAY_FASTEST,
+    );
+
     subscription = stream.listen(
-      (sensorEvent) {
-        _timestamp = DateTime.now();
-        while (data.first.isNotEmpty &&
-            _timestamp.difference(data.first.first.timestamp).inSeconds >
-                bufferSizeSeconds) {
-          for (int i = 0; i < channels.length; i++) {
-            data[i].removeAt(0);
-          }
-        }
-        for (int i = 0; i < channels.length; i++) {
-          data[i].add(
-            SensorValue(
-              _timestamp,
-              sensorEvent.data[channels[i]],
-            ),
-          );
+      (SensorEvent sensorEvent) {
+        if (recording) {
+          final DateTime timestamp = DateTime.now();
+          recorder.writeRow(
+              values: channels.map((int channel) => sensorEvent.data[channel]),
+              timestamp: timestamp);
         }
       },
     );
   }
 
-  void _clearData() {
-    data = List.generate(
-      this.channels.length,
-      (_) => List<SensorValue>.generate(
-        _n,
-        (int index) => SensorValue(
-            DateTime.fromMillisecondsSinceEpoch(
-                _timestamp.millisecondsSinceEpoch - (_n - 1 - index) * _t),
-            0),
-      ),
-    );
-  }
-
-  void dispose() {
-    subscription?.cancel();
+  File stop() {
+    return super.stop();
   }
 }
